@@ -1,5 +1,5 @@
 # eng-scripts
-Scripts from MySQL Engineering Team
+Scripts from Percona Engineering Team
 
 ## Examples
 
