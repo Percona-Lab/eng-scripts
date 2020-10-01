@@ -5,18 +5,55 @@
 
 FILE=$1
 decode_encryption() {
+  PHY_SIZE=$1
+  OFFSET=0
+  case $PHY_SIZE in
+  65536)
+    OFFSET=41110
+    ;;
+  32768)
+    OFFSET=20630
+    ;;
+  16384)
+    OFFSET=10390
+    ;;
+  8192)
+    OFFSET=5270
+    ;;
+  4096)
+    OFFSET=2710
+    ;;
+  2048)
+    OFFSET=1430
+    ;;
+  1024)
+    OFFSET=790
+    ;;
+esac
+
+  if [ $OFFSET == 0 ]; then
+   echo "Invalid Page Size found. Cannot decode encryption information from Page 0"
+   return;
+  fi
+
+  echo "ENCRYPTION OFFSET: $OFFSET"
+
   echo
   echo "------ Encryption ------"
-  ENCRYPTION_KEY_MAGIC=$(xxd -p -s10390 -l3 $FILE | xxd -r -p)
+  ENCRYPTION_KEY_MAGIC=$(xxd -p -s$OFFSET -l3 $FILE | xxd -r -p)
   echo "ENCRYPTION_KEY_MAGIC: $ENCRYPTION_KEY_MAGIC"
-  MASTER_KEY_ID=$(xxd -b -s10393 -l4 $FILE |  awk '{print $2 $3 $4 $5}')
+  OFFSET=$(($OFFSET + 3))
+  MASTER_KEY_ID=$(xxd -b -s$OFFSET -l4 $FILE |  awk '{print $2 $3 $4 $5}')
   echo "MASTER_KEY_ID: $MASTER_KEY_ID ( $((2#$MASTER_KEY_ID)) )"
-  SERVER_UUID=$(xxd -p -s10397 -l36 $FILE | xxd -r -p | tr -d '\0')
+  OFFSET=$(($OFFSET + 4))
+  SERVER_UUID=$(xxd -p -s$OFFSET -l36 $FILE | xxd -r -p | tr -d '\0')
   echo "SERVER UUID: $SERVER_UUID"
   echo "Key:"
-  xxd -s10433 -l32 $FILE
+  OFFSET=$(($OFFSET + 36))
+  xxd -s$OFFSET -l32 $FILE
+  OFFSET=$(($OFFSET + 32))
   echo "iv: "
-  xxd -s10465 -l32 $FILE
+  xxd -s$OFFSET -l32 $FILE
 }
 decode_flags() {
   FLAGS=$1
@@ -30,47 +67,67 @@ decode_flags() {
   S_FSP_FLAGS_WIDTH_ENCRYPTION=1
   S_FSP_FLAGS_WIDTH_SDI=1
   BIT4_MASK=$(($((1<<4)) - 1))
+
   ANTELOPE=$(($FLAGS & 1))
   echo "ANTELOPE: $ANTELOPE"
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_POST_ANTELOPE))
   ZIP_SSIZE=$(($FLAGS & $BIT4_MASK))
-  echo "ZIP_SSIZE: $ZIP_SSIZE"
+  #echo "ZIP_SSIZE: $ZIP_SSIZE"
+
+  PHY_SIZE=0
   if [ $ZIP_SSIZE != 0 ]; then
    COMPRESSED_PAGE_SIZE=$((512 << $ZIP_SSIZE))
-   echo "COMPRESSED PAGE_SIZE: $COMPRESSED_PAGE_SIZE"
+   #echo "COMPRESSED PAGE_SIZE: $COMPRESSED_PAGE_SIZE"
+   echo "COMPRESSED: YES"
+   PHY_SIZE=$COMPRESSED_PAGE_SIZE
   else
    echo "COMPRESSED: NO"
   fi
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_ZIP_SSIZE))
   ATOMIC_BLOBS=$(($FLAGS & 1))
   echo "ATOMIC_BLOBS: $ATOMIC_BLOBS"
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_ATOMIC_BLOBS))
   PAGE_SSIZE=$(($FLAGS & $BIT4_MASK))
-  echo "PAGE_SSIZE: $PAGE_SSIZE"
+  #echo "PAGE_SSIZE: $PAGE_SSIZE"
+
   if [ $PAGE_SSIZE != 0 ]; then
    UNCOMPRESSED_PAGE_SIZE=$((512 << $PAGE_SSIZE))
-   echo "UNCOMPRESSED PAGE_SIZE: $UNCOMPRESSED_PAGE_SIZE"
   else
-   echo "UNCOMPRESSED PAGE_SIZE: 16384"
+   UNCOMPRESSED_PAGE_SIZE=16384
   fi
+
+  if [ $PHY_SIZE == 0 ]; then
+     PHY_SIZE=$UNCOMPRESSED_PAGE_SIZE
+  fi
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_PAGE_SSIZE))
   DATA_DIR=$(($FLAGS & 1))
   echo "DATADIR: $DATA_DIR"
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_DATA_DIR))
   SHARED=$(($FLAGS & 1))
   echo "SHARED_TABLESPACE: $SHARED"
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_SHARED))
   TEMPORARY=$(($FLAGS & 1))
   echo "TEMPORARY TABLESPACE: $TEMPORARY"
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_TEMPORARY))
   ENCRYPTION=$(($FLAGS & 1))
   echo "ENCRYPTION: $ENCRYPTION"
+
   FLAGS=$(($FLAGS >> $S_FSP_FLAGS_WIDTH_ENCRYPTION))
   SDI=$(($FLAGS & 1))
   echo "SDI: $SDI"
  
+  echo "PHYSICAL_PAGE_SIZE: $PHY_SIZE"
+  echo "UNCOMP_PAGE_SIZE  : $UNCOMPRESSED_PAGE_SIZE"
+
   if [[ $ENCRYPTION -eq "1" ]]; then
-    decode_encryption
+    decode_encryption $PHY_SIZE
   fi
 }
 echo "Reading FSP_FLAGS of ${FILE}"
