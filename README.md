@@ -34,11 +34,13 @@ Key:
 iv:
 000028e1: 02ba 423b e551 6764 5770 f5a9 18f3 d2a9  ..B;.QgdWp......
 000028f1: 5a21 732a 7fd3 12d0 7b74 6ec2 dc36 a909  Z!s*....{tn..6..
+```
 
 ### dump_space_ids.sh
 Dumps tablespace_ids of all tablespaces (.ibd, .ibu, undo*, ibtmp*)
 
-dump_space_ids.sh ./var/mysqld.1/data/
+```
+./dump_space_ids.sh ./var/mysqld.1/data/
 file name ./var/mysqld.1/data/satya/t3.ibd : space_id           9
 file name ./var/mysqld.1/data/satya/t2.ibd : space_id           8
 file name ./var/mysqld.1/data/satya/t1.ibd : space_id           7
@@ -53,5 +55,4 @@ file name ./var/mysqld.1/data/undo_001 : space_id  4294967279
 file name ./var/mysqld.1/data/undo_002 : space_id  4294967278
 file name ./var/mysqld.1/data/ibtmp1 : space_id  4294967293
 file name ./var/mysqld.1/data/ibdata1 : space_id           0
-
 ```
