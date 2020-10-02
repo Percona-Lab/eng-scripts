@@ -36,7 +36,7 @@ esac
    return;
   fi
 
-  echo "ENCRYPTION OFFSET: $OFFSET"
+  echo "ENCRYPTION OFFSET : $OFFSET"
 
   echo
   echo "------ Encryption ------"
@@ -52,7 +52,7 @@ esac
   OFFSET=$(($OFFSET + 36))
   xxd -s$OFFSET -l32 $FILE
   OFFSET=$(($OFFSET + 32))
-  echo "iv: "
+  echo "iv:"
   xxd -s$OFFSET -l32 $FILE
 }
 decode_flags() {
