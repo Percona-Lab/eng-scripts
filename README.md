@@ -57,3 +57,15 @@ file name ./var/mysqld.1/data/undo_002 : space_id  4294967278
 file name ./var/mysqld.1/data/ibtmp1 : space_id  4294967293
 file name ./var/mysqld.1/data/ibdata1 : space_id           0
 ```
+
+
+### innodb_read_binlog_info_from_ibdata.sh
+Reads binlog information from ibdata1 files
+
+```
+./innodb_read_binlog_info_from_ibdata.sh /work/ps/ins/8.0/datadir1/ibdata1
+Binlog is not stored in /work/ps/ins/8.0/datadir1/ibdata1
+
+./innodb_read_binlog_info_from_ibdata.sh /work/ps/ins/8.0/datadir1/ibdata1
+Binlog Name and Position : binlog.000001 1105
+
