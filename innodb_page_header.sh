@@ -46,6 +46,7 @@ esac
   ENCRYPTION_KEY_MAGIC=$(xxd -p -s$OFFSET -l3 $FILE | xxd -r -p)
   echo "ENCRYPTION_KEY_MAGIC: $ENCRYPTION_KEY_MAGIC"
   OFFSET=$(($OFFSET + 3))
+  echo $OFFSET
   MASTER_KEY_ID=$(xxd -b -s$OFFSET -l4 $FILE |  awk '{print $2 $3 $4 $5}')
   echo "MASTER_KEY_ID: $MASTER_KEY_ID ( $((2#$MASTER_KEY_ID)) )"
   OFFSET=$(($OFFSET + 4))

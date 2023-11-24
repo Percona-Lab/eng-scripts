@@ -24,3 +24,6 @@ xxd -s$OFFSET -l32 $FILE
 OFFSET=$(($OFFSET + 32))
 echo "iv:"
 xxd -s$OFFSET -l32 $FILE
+
+#printf '\x0\x0\x0\x1' | dd of=backup/ib_logfile0 bs=1 seek=1075 count=4 conv=notrunc
+#printf '\x36\x32\x64\x35\x65\x33\x33\x36\x2d\x65\x65\x34\x39\x2d\x31\x31\x65\x62\x2d\x39\x33\x65\x34\x2d\x64\x34\x35\x64\x36\x34\x33\x34\x37\x61\x31\x39' | dd of=backup/ib_logfile0 bs=1 seek=1079 count=36 conv=notrunc
