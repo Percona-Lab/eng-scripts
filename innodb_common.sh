@@ -3,7 +3,9 @@
 decode_flags()
 {
   FLAGS=$1
-  FLAGS=`echo "ibase=2; $FLAGS" | bc`
+  echo "input for decode_flags is $FLAGS"
+  # The below is required only if input is binary digits
+  # FLAGS=`echo "ibase=2; $FLAGS" | bc`
 
   export FLAGS
   S_FSP_FLAGS_WIDTH_POST_ANTELOPE=1
@@ -63,7 +65,8 @@ decode_flags()
 decode_page0_flags()
 {
   FILE=$1
-  FLAGS=$(xxd -b -s54 -l4 $FILE | awk '{print $2 $3 $4 $5}')
+  FLAGS=$(od -An -j 54 -D -N4  --endian=big $FILE)
+  #FLAGS=$(xxd -b -s54 -l4 $FILE | awk '{print $2 $3 $4 $5}')
   #other way. Depends on od have --endian option. Not all od versions have it
   #FLAGS=$(od -An -j 54 -D -N4  --endian=big $FILE')// For 4 bytes, use -D
   #LSN=$(od -An -j 16 -L -N8  --endian=big $FILE') // For 8 bytes, use -L
@@ -94,4 +97,38 @@ print_decoded_flags() {
 
   echo "PHYSICAL_PAGE_SIZE: $PHY_SIZE"
   echo "UNCOMP_PAGE_SIZE  : $UNCOMPRESSED_PAGE_SIZE"
+}
+
+print_decoded_flags() {
+  echo "FLAGS: $FLAGS"
+  echo "ANTELOPE: $ANTELOPE"
+
+  if [ $ZIP_SSIZE != 0 ]; then
+   echo "COMPRESSED: YES"
+  else
+   echo "COMPRESSED: NO"
+  fi
+
+  echo "ATOMIC_BLOBS: $ATOMIC_BLOBS"
+
+  echo "DATADIR: $DATA_DIR"
+
+  echo "SHARED_TABLESPACE: $SHARED"
+
+  echo "TEMPORARY TABLESPACE: $TEMPORARY"
+
+  echo "ENCRYPTION: $ENCRYPTION"
+
+  echo "SDI: $SDI"
+
+  echo "PHYSICAL_PAGE_SIZE: $PHY_SIZE"
+  echo "UNCOMP_PAGE_SIZE  : $UNCOMPRESSED_PAGE_SIZE"
+
+}
+
+# called only after decode_page0_flags
+print_encryption() {
+  if [[ $ENCRYPTION -eq "1" ]]; then
+    decode_encryption $PHY_SIZE
+  fi
 }

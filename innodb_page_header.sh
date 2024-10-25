@@ -60,35 +60,6 @@ esac
   xxd -s$OFFSET -l32 $FILE
 }
 
-print_decoded_flags() {
-  echo "FLAGS: $FLAGS"
-  echo "ANTELOPE: $ANTELOPE"
-
-  if [ $ZIP_SSIZE != 0 ]; then
-   echo "COMPRESSED: YES"
-  else
-   echo "COMPRESSED: NO"
-  fi
-
-  echo "ATOMIC_BLOBS: $ATOMIC_BLOBS"
-
-  echo "DATADIR: $DATA_DIR"
-
-  echo "SHARED_TABLESPACE: $SHARED"
-
-  echo "TEMPORARY TABLESPACE: $TEMPORARY"
-
-  echo "ENCRYPTION: $ENCRYPTION"
-
-  echo "SDI: $SDI"
-
-  echo "PHYSICAL_PAGE_SIZE: $PHY_SIZE"
-  echo "UNCOMP_PAGE_SIZE  : $UNCOMPRESSED_PAGE_SIZE"
-
-  if [[ $ENCRYPTION -eq "1" ]]; then
-    decode_encryption $PHY_SIZE
-  fi
-}
 echo "Reading FSP_FLAGS of ${FILE}"
 SPACE_ID=$(od -An -j38 -D -N4 --endian=big $FILE)
 echo "SPACE_ID of tablespace: $SPACE_ID"
@@ -96,3 +67,4 @@ echo "SPACE_ID of tablespace: $SPACE_ID"
 echo
 decode_page0_flags $FILE
 print_decoded_flags
+print_encryption
