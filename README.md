@@ -1,14 +1,22 @@
 # eng-scripts
 Scripts from Percona Engineering Team
 
+## Layout
+
+| Directory      | Feature                                   | Scripts |
+|----------------|-------------------------------------------|---------|
+| `tablespace/`  | InnoDB tablespace files (`.ibd`, `ibdata*`, `undo*`, `ibtmp*`, `.cfg`) | `innodb_page_header.sh`, `innodb_decode_flags.sh`, `dump_space_ids.sh`, `innodb_read_binlog_info_from_ibdata.sh`, `innodb_cfg_export_tablespace.sh`, `ibd_tool.py`, `innodb_common.sh` (shared helpers) |
+| `redo_log/`    | InnoDB redo log files (`ib_logfile*`, `#ib_redo*`) | `innodb_redo_dump_block_header.sh`, `innodb_redo_log_encryption.sh`, `common.sh` (shared macros) |
+| `compression/` | Compression formats                       | `zstd_header_decode.sh` |
+
 ## Examples
 
-### innodb_page_header.sh
+### tablespace/innodb_page_header.sh
 Read information about FSP Flags from page0 header.
 In case of encryption, it also displays encryption information:
 
 ```
-./innodb_page_header.sh ./var/mysqld.1/data/test/t1.ibd
+./tablespace/innodb_page_header.sh ./var/mysqld.1/data/test/t1.ibd
 Reading FSP_FLAGS of ./var/mysqld.1/data/test/t1.ibd
 SPACE_ID of tablespace:           5
 
@@ -37,11 +45,11 @@ iv:
 000028f1: c88d 3532 15cd 334b 6fef 98c2 476b b72b  ..52..3Ko...Gk.+
 ```
 
-### dump_space_ids.sh
+### tablespace/dump_space_ids.sh
 Dumps tablespace_ids of all tablespaces (.ibd, .ibu, undo*, ibtmp*)
 
 ```
-./dump_space_ids.sh ./var/mysqld.1/data/
+./tablespace/dump_space_ids.sh ./var/mysqld.1/data/
 file name ./var/mysqld.1/data/satya/t3.ibd : space_id           9
 file name ./var/mysqld.1/data/satya/t2.ibd : space_id           8
 file name ./var/mysqld.1/data/satya/t1.ibd : space_id           7
@@ -59,13 +67,13 @@ file name ./var/mysqld.1/data/ibdata1 : space_id           0
 ```
 
 
-### innodb_read_binlog_info_from_ibdata.sh
+### tablespace/innodb_read_binlog_info_from_ibdata.sh
 Reads binlog information from ibdata1 files
 
 ```
-./innodb_read_binlog_info_from_ibdata.sh /work/ps/ins/8.0/datadir1/ibdata1
+./tablespace/innodb_read_binlog_info_from_ibdata.sh /work/ps/ins/8.0/datadir1/ibdata1
 Binlog is not stored in /work/ps/ins/8.0/datadir1/ibdata1
 
-./innodb_read_binlog_info_from_ibdata.sh /work/ps/ins/8.0/datadir1/ibdata1
+./tablespace/innodb_read_binlog_info_from_ibdata.sh /work/ps/ins/8.0/datadir1/ibdata1
 Binlog Name and Position : binlog.000001 1105
 
