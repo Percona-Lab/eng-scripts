@@ -8,6 +8,7 @@ Scripts from Percona Engineering Team
 | `tablespace/`  | InnoDB tablespace files (`.ibd`, `ibdata*`, `undo*`, `ibtmp*`, `.cfg`) | `innodb_page_header.sh`, `innodb_decode_flags.sh`, `dump_space_ids.sh`, `innodb_read_binlog_info_from_ibdata.sh`, `innodb_cfg_export_tablespace.sh`, `ibd_tool.py`, `innodb_common.sh` (shared helpers) |
 | `redo_log/`    | InnoDB redo log files (`ib_logfile*`, `#ib_redo*`) | `innodb_redo_dump_block_header.sh`, `innodb_redo_log_encryption.sh`, `common.sh` (shared macros) |
 | `compression/` | Compression formats                       | `zstd_header_decode.sh` |
+| `tickets`      | Comparing lists of the JIRA tickets assigned to a fix version with the commits that went into a release.  | `git-log-tickets.py`, `jira-tickets.py`, `csv-join.py` | 
 
 ## Examples
 
