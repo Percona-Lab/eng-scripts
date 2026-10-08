@@ -41,6 +41,7 @@ Columns: key, summary, status, fix versions (`; `-separated), sorted by key.
 | `-f`, `--fix-version` | fix version to search for (required) |
 | `-s`, `--status` | only tickets with this status, e.g. `Done` |
 | `-m`, `--match PATTERN` | summary condition, can be repeated: `PATTERN` = summary contains, `!PATTERN` = summary does not contain, `''` = no condition. Default: `'!\[doc'` (excludes doc tickets) |
+| `-d`, `--debug` | print debugging information (JQL, URLs, HTTP status, paging) to stderr; the token is never printed |
 
 ```
 jira-ticket.py -f '8.0.41-32 (Q1 2025)' > tickets.csv
@@ -59,6 +60,11 @@ Environment variables (set before running):
 | `JIRA_EMAIL` | Atlassian account email (required) |
 | `JIRA_TOKEN_FILE` | path to a file containing the API token (takes precedence) |
 | `JIRA_TOKEN` | the API token itself (used if `JIRA_TOKEN_FILE` is not set) |
+
+Before searching, the script checks the credentials (`/rest/api/3/myself`).
+JIRA answers requests with a rejected token as anonymous, returning only
+public tickets, so instead of silently giving incomplete results the script
+stops with an error and exit code 3.
 
 ## csv-join.py
 
